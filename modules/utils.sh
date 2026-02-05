@@ -47,6 +47,29 @@ setup_utils() {
         log_success "GitHub CLI is already installed"
     fi
 
+    # Ensure ctags is installed (for code navigation in vim/editors)
+    if ! command_exists ctags; then
+        log_info "Installing ctags..."
+        local os=$(detect_os)
+        case "$os" in
+            macos)
+                brew install universal-ctags
+                ;;
+            ubuntu)
+                sudo apt-get update -qq
+                sudo apt-get install -y universal-ctags
+                ;;
+            *)
+                log_warn "Could not install ctags automatically on this OS"
+                ;;
+        esac
+        if command_exists ctags; then
+            log_success "ctags installed"
+        fi
+    else
+        log_success "ctags is already installed"
+    fi
+
     # Install Python dependencies (only if not already installed)
     if ! python3 -c "import markdown" 2>/dev/null; then
         log_info "Installing Python dependencies..."
