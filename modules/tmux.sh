@@ -54,41 +54,34 @@ set -g history-limit 50000
 set -g mouse on
 
 # ============================================
-# Dracula Theme
+# Dracula Theme (via Oh My Tmux variables)
 # ============================================
-# Dracula Color Palette
-dracula_bg="#282a36"
-dracula_fg="#f8f8f2"
-dracula_cyan="#8be9fd"
-dracula_green="#50fa7b"
-dracula_orange="#ffb86c"
-dracula_pink="#ff79c6"
-dracula_purple="#bd93f9"
-dracula_red="#ff5555"
-dracula_yellow="#f1fa8c"
+# Override Oh My Tmux theme colors with Dracula palette
+tmux_conf_theme_colour_1="none"       # transparent background
+tmux_conf_theme_colour_2="#44475a"    # dracula current line
+tmux_conf_theme_colour_3="#f8f8f2"    # dracula foreground
+tmux_conf_theme_colour_4="#bd93f9"    # dracula purple
+tmux_conf_theme_colour_5="#ff79c6"    # dracula pink
+tmux_conf_theme_colour_6="#282a36"    # dracula background (for text bg)
+tmux_conf_theme_colour_7="#f8f8f2"    # dracula foreground
+tmux_conf_theme_colour_8="#282a36"    # dracula background
+tmux_conf_theme_colour_9="#bd93f9"    # dracula purple
+tmux_conf_theme_colour_10="#ff79c6"   # dracula pink
+tmux_conf_theme_colour_11="#50fa7b"   # dracula green
+tmux_conf_theme_colour_12="#6272a4"   # dracula comment
+tmux_conf_theme_colour_13="#f8f8f2"   # dracula foreground
+tmux_conf_theme_colour_14="#282a36"   # dracula background
+tmux_conf_theme_colour_15="none"      # transparent
+tmux_conf_theme_colour_16="#bd93f9"   # dracula purple
+tmux_conf_theme_colour_17="#bd93f9"   # dracula purple
 
-# Pane border colors
-set -g pane-border-style "fg=${dracula_purple}"
-set -g pane-active-border-style "fg=${dracula_pink}"
+# Transparent status bar background
+tmux_conf_theme_status_bg="none"
+tmux_conf_theme_window_status_bg="none"
 
-# Message style
-set -g message-style "bg=${dracula_purple},fg=${dracula_bg}"
-
-# Status bar (default bg for transparency)
-set -g status-style "bg=default,fg=${dracula_fg}"
-set -g status-left-length 50
-set -g status-right-length 100
-
-# Status left: session name
-set -g status-left "#[bg=${dracula_purple},fg=${dracula_bg},bold] #S #[bg=default,fg=${dracula_purple}]"
-
-# Status right: date and time
-set -g status-right "#[fg=${dracula_cyan}]%Y-%m-%d #[fg=${dracula_pink}]%H:%M #[bg=${dracula_purple},fg=${dracula_bg},bold] #h "
-
-# Window status
-set -g window-status-format "#[fg=${dracula_fg},bg=default] #I:#W "
-set -g window-status-current-format "#[bg=${dracula_pink},fg=${dracula_bg},bold] #I:#W #[bg=default,fg=${dracula_pink}]"
-set -g window-status-separator ""
+# Pane borders
+tmux_conf_theme_pane_border="$tmux_conf_theme_colour_2"
+tmux_conf_theme_pane_active_border="$tmux_conf_theme_colour_4"
 
 # Enable 256 colors and true color
 set -g default-terminal "tmux-256color"
