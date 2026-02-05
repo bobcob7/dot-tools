@@ -47,7 +47,7 @@ setup_tmux() {
     # Apply Dracula theme colors (modify in place - Oh My Tmux reads these before EOF)
     log_info "Applying Dracula theme colors..."
     sed -i \
-        -e 's/^tmux_conf_theme_colour_1=.*/tmux_conf_theme_colour_1="none"       # transparent/' \
+        -e 's/^tmux_conf_theme_colour_1=.*/tmux_conf_theme_colour_1="default"    # transparent/' \
         -e 's/^tmux_conf_theme_colour_2=.*/tmux_conf_theme_colour_2="#44475a"    # dracula current line/' \
         -e 's/^tmux_conf_theme_colour_3=.*/tmux_conf_theme_colour_3="#f8f8f2"    # dracula foreground/' \
         -e 's/^tmux_conf_theme_colour_4=.*/tmux_conf_theme_colour_4="#bd93f9"    # dracula purple/' \
@@ -61,7 +61,7 @@ setup_tmux() {
         -e 's/^tmux_conf_theme_colour_12=.*/tmux_conf_theme_colour_12="#6272a4"  # dracula comment/' \
         -e 's/^tmux_conf_theme_colour_13=.*/tmux_conf_theme_colour_13="#f8f8f2"  # dracula foreground/' \
         -e 's/^tmux_conf_theme_colour_14=.*/tmux_conf_theme_colour_14="#282a36"  # dracula background/' \
-        -e 's/^tmux_conf_theme_colour_15=.*/tmux_conf_theme_colour_15="none"     # transparent/' \
+        -e 's/^tmux_conf_theme_colour_15=.*/tmux_conf_theme_colour_15="default"  # transparent/' \
         -e 's/^tmux_conf_theme_colour_16=.*/tmux_conf_theme_colour_16="#ff5555"  # dracula red/' \
         -e 's/^tmux_conf_theme_colour_17=.*/tmux_conf_theme_colour_17="#f8f8f2"  # dracula foreground/' \
         "$tmux_local"
