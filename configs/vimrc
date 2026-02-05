@@ -1,0 +1,167 @@
+" dot-tools Vim Configuration
+" Managed by setup.sh - edit configs/vimrc to make changes
+
+" ============================================
+" Plugin Manager (vim-plug)
+" ============================================
+call plug#begin('~/.vim/plugged')
+
+" --- LSP & Completion ---
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+
+" --- Linting ---
+Plug 'dense-analysis/ale'
+
+" --- Syntax ---
+Plug 'sheerun/vim-polyglot'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" --- Navigation ---
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'preservim/nerdtree'
+
+" --- Tags ---
+Plug 'preservim/tagbar'
+Plug 'ludovicchabant/vim-gutentags'
+
+" --- Git ---
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" --- Editing ---
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'wellle/targets.vim'
+Plug 'tpope/vim-repeat'
+Plug 'godlygeek/tabular'
+
+" --- Motion ---
+Plug 'easymotion/vim-easymotion'
+Plug 'justinmk/vim-sneak'
+
+" --- Search ---
+Plug 'mhinz/vim-grepper'
+
+" --- UI ---
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+" --- Utilities ---
+Plug 'mbbill/undotree'
+Plug 'tpope/vim-obsession'
+Plug 'mhinz/vim-startify'
+Plug 'tpope/vim-sensible'
+
+" --- Theme ---
+Plug 'dracula/vim', { 'as': 'dracula' }
+
+call plug#end()
+
+" ============================================
+" Theme & Appearance
+" ============================================
+set termguicolors
+set background=dark
+colorscheme dracula
+
+" Transparency support
+hi Normal guibg=NONE ctermbg=NONE
+hi NonText guibg=NONE ctermbg=NONE
+hi LineNr guibg=NONE ctermbg=NONE
+hi SignColumn guibg=NONE ctermbg=NONE
+hi EndOfBuffer guibg=NONE ctermbg=NONE
+
+" Airline theme
+let g:airline_theme='dracula'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+
+" ============================================
+" General Settings
+" ============================================
+set number                  " Show line numbers
+set relativenumber          " Relative line numbers
+set cursorline              " Highlight current line
+set showmatch               " Highlight matching brackets
+set hlsearch                " Highlight search results
+set incsearch               " Incremental search
+set ignorecase              " Case insensitive search
+set smartcase               " Case sensitive if uppercase present
+set expandtab               " Use spaces instead of tabs
+set shiftwidth=4            " Indent width
+set tabstop=4               " Tab width
+set softtabstop=4           " Soft tab width
+set autoindent              " Auto indent
+set smartindent             " Smart indent
+set wrap                    " Wrap lines
+set linebreak               " Wrap at word boundaries
+set scrolloff=8             " Keep 8 lines above/below cursor
+set sidescrolloff=8         " Keep 8 columns left/right of cursor
+set mouse=a                 " Enable mouse support
+set clipboard=unnamedplus   " Use system clipboard
+set hidden                  " Allow hidden buffers
+set updatetime=100          " Faster updates (for gitgutter)
+set signcolumn=yes          " Always show sign column
+
+" Persistent undo
+set undofile
+set undodir=~/.vim/undodir
+
+" ============================================
+" Key Mappings
+" ============================================
+let mapleader = " "         " Space as leader key
+
+" NERDTree
+nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <leader>f :NERDTreeFind<CR>
+
+" fzf
+nnoremap <leader>p :Files<CR>
+nnoremap <leader>b :Buffers<CR>
+nnoremap <leader>g :Rg<CR>
+
+" Tagbar
+nnoremap <leader>t :TagbarToggle<CR>
+
+" Undotree
+nnoremap <leader>u :UndotreeToggle<CR>
+
+" Clear search highlight
+nnoremap <leader>h :nohlsearch<CR>
+
+" Window navigation
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Buffer navigation
+nnoremap <leader>bn :bnext<CR>
+nnoremap <leader>bp :bprevious<CR>
+nnoremap <leader>bd :bdelete<CR>
+
+" ============================================
+" Plugin Settings
+" ============================================
+
+" vim-lsp
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_float_cursor = 1
+
+" ALE
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚠'
+let g:ale_fix_on_save = 1
+
+" vim-sneak
+let g:sneak#label = 1
+
+" Startify
+let g:startify_change_to_dir = 0
+let g:startify_session_persistence = 1
+
+" Gutentags
+let g:gutentags_cache_dir = '~/.vim/tags'

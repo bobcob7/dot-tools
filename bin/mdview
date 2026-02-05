@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+"""
+mdview - Render markdown to HTML and open in browser
+
+Usage: mdview <file.md>
+"""
+
+import sys
+import os
+import tempfile
+import webbrowser
+import subprocess
+import shutil
+
+try:
+    import markdown
+except ImportError:
+    print("Error: 'markdown' package not installed.")
+    print("Install with: pip install markdown")
+    sys.exit(1)
+
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <style>
+        :root {{
+            --bg-color: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-color: #eaeaea;
+            --text-muted: #a0a0a0;
+            --accent: #0f3460;
+            --link-color: #4da8da;
+            --code-bg: #0d1117;
+            --border-color: #30363d;
+            --table-stripe: #21262d;
+        }}
+
+        * {{
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }}
+
+        h1, h2, h3, h4, h5, h6 {{
+            color: var(--text-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+        }}
+
+        h1 {{
+            font-size: 2em;
+            border-bottom: 2px solid var(--link-color);
+        }}
+
+        h2 {{
+            font-size: 1.5em;
+        }}
+
+        a {{
+            color: var(--link-color);
+            text-decoration: none;
+        }}
+
+        a:hover {{
+            text-decoration: underline;
+        }}
+
+        code {{
+            background-color: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+            font-size: 0.9em;
+        }}
+
+        pre {{
+            background-color: var(--code-bg);
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }}
+
+        pre code {{
+            background: none;
+            padding: 0;
+        }}
+
+        blockquote {{
+            border-left: 4px solid var(--link-color);
+            margin: 1em 0;
+            padding: 0.5em 1em;
+            background-color: var(--bg-secondary);
+            border-radius: 0 8px 8px 0;
+        }}
+
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+        }}
+
+        th, td {{
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }}
+
+        th {{
+            background-color: var(--accent);
+            font-weight: 600;
+        }}
+
+        tr:nth-child(even) {{
+            background-color: var(--table-stripe);
+        }}
+
+        tr:hover {{
+            background-color: var(--bg-secondary);
+        }}
+
+        hr {{
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 2em 0;
+        }}
+
+        ul, ol {{
+            padding-left: 1.5em;
+        }}
+
+        li {{
+            margin: 0.25em 0;
+        }}
+
+        img {{
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }}
+
+        .container {{
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        {content}
+    </div>
+</body>
+</html>
+"""
+
+
+def is_wsl():
+    """Check if running in WSL."""
+    try:
+        with open('/proc/version', 'r') as f:
+            return 'microsoft' in f.read().lower()
+    except FileNotFoundError:
+        return False
+
+
+def get_windows_temp_dir():
+    """Get Windows temp directory path from WSL."""
+    # Try to find the Windows user's temp directory
+    mnt_users = '/mnt/c/Users'
+    if os.path.exists(mnt_users):
+        for user in os.listdir(mnt_users):
+            temp_dir = os.path.join(mnt_users, user, 'AppData', 'Local', 'Temp')
+            if os.path.isdir(temp_dir) and user not in ('Public', 'Default', 'Default User', 'All Users'):
+                return temp_dir
+    return None
+
+
+def render_markdown(filepath):
+    """Render markdown file to HTML and open in browser."""
+    if not os.path.exists(filepath):
+        print(f"Error: File not found: {filepath}")
+        sys.exit(1)
+
+    with open(filepath, 'r', encoding='utf-8') as f:
+        md_content = f.read()
+
+    # Convert markdown to HTML with extensions
+    md = markdown.Markdown(extensions=[
+        'tables',
+        'fenced_code',
+        'codehilite',
+        'toc',
+        'nl2br',
+    ])
+    html_content = md.convert(md_content)
+
+    # Get title from filename
+    title = os.path.basename(filepath).replace('.md', '')
+
+    # Generate full HTML
+    full_html = HTML_TEMPLATE.format(title=title, content=html_content)
+
+    # Determine temp directory - use Windows temp if in WSL
+    in_wsl = is_wsl()
+    temp_dir = None
+    if in_wsl:
+        temp_dir = get_windows_temp_dir()
+
+    # Write to temp file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False,
+                                      encoding='utf-8', dir=temp_dir) as f:
+        f.write(full_html)
+        temp_path = f.name
+
+    print(f"Rendered: {filepath}")
+    print(f"HTML file: {temp_path}")
+
+    # Try to open in browser
+    if in_wsl and temp_dir:
+        # Convert to Windows path for easy access
+        win_path = subprocess.run(
+            ['wslpath', '-w', temp_path],
+            capture_output=True, text=True
+        ).stdout.strip()
+        if win_path:
+            print(f"Windows path: {win_path}")
+            # Try to open with Windows - may fail if WSL interop is disabled
+            try:
+                # Try powershell first as it's more reliable
+                result = subprocess.run(
+                    ['powershell.exe', '-Command', f'Start-Process "{win_path}"'],
+                    capture_output=True, check=False
+                )
+                if result.returncode != 0:
+                    raise OSError("powershell failed")
+            except OSError:
+                # WSL interop likely disabled - just print the path
+                print(f"\nOpen this path in your Windows browser: {win_path}")
+    elif shutil.which('wslview'):
+        subprocess.run(['wslview', temp_path], check=False)
+    elif shutil.which('xdg-open'):
+        subprocess.run(['xdg-open', temp_path], check=False)
+    elif shutil.which('open'):  # macOS
+        subprocess.run(['open', temp_path], check=False)
+    else:
+        # Fallback to webbrowser module
+        webbrowser.open(f'file://{temp_path}')
+
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__.strip())
+        sys.exit(1)
+
+    filepath = sys.argv[1]
+    render_markdown(filepath)
+
+
+if __name__ == '__main__':
+    main()
