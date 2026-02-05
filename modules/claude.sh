@@ -28,8 +28,12 @@ setup_claude() {
     sync_claude_dir "skills"
     sync_claude_dir "agents"
     sync_claude_dir "rules"
+    sync_claude_dir "mcp"
 
-    # Install plugins
+    # Install MCP servers
+    install_mcp_servers
+
+    # Install plugins (official marketplace)
     install_claude_plugins
 
     log_success "Claude Code setup complete"
@@ -102,14 +106,19 @@ install_claude_plugins() {
     done
 }
 
-# Install a single Claude plugin
+# Install or update a single Claude plugin from official marketplace
 install_claude_plugin() {
     local plugin="$1"
     local plugin_name="${plugin%%@*}"  # Extract name before @
 
     # Check if plugin is already installed
     if claude plugin list 2>/dev/null | grep -q "^$plugin_name"; then
-        log_success "Plugin $plugin_name already installed"
+        log_info "Updating plugin: $plugin_name..."
+        if claude plugin update "$plugin_name" 2>/dev/null; then
+            log_success "Plugin $plugin_name up to date"
+        else
+            log_warn "Failed to update plugin: $plugin_name"
+        fi
         return 0
     fi
 
@@ -120,6 +129,7 @@ install_claude_plugin() {
         log_warn "Failed to install plugin: $plugin (may need manual installation)"
     fi
 }
+
 
 # Install LSP server dependencies
 install_lsp_dependencies() {
@@ -152,6 +162,41 @@ install_lsp_dependencies() {
     else
         log_warn "go not found, skipping Go LSP dependency"
     fi
+}
+
+# Install MCP servers from mcp/ directory
+install_mcp_servers() {
+    if ! command_exists claude; then
+        log_warn "Claude CLI not found, skipping MCP server installation"
+        return 0
+    fi
+
+    local mcp_dir="$DOTFILES_DIR/configs/claude/mcp"
+
+    if [[ ! -d "$mcp_dir" ]]; then
+        return 0
+    fi
+
+    log_info "Installing MCP servers..."
+
+    for server_dir in "$mcp_dir"/*/; do
+        if [[ -d "$server_dir" ]]; then
+            local server_name=$(basename "$server_dir")
+            local server_script="$HOME/.claude/mcp/$server_name/main.py"
+
+            # Check if server is already registered
+            if claude mcp list 2>/dev/null | grep -q "^$server_name"; then
+                log_success "MCP server $server_name already registered"
+            else
+                log_info "Registering MCP server: $server_name..."
+                if claude mcp add --transport stdio --scope user "$server_name" -- python3 "$server_script" 2>/dev/null; then
+                    log_success "Registered MCP server: $server_name"
+                else
+                    log_warn "Failed to register MCP server: $server_name"
+                fi
+            fi
+        fi
+    done
 }
 
 # Sync a single file
@@ -214,6 +259,20 @@ sync_claude_dir() {
             fi
         done
         log_success "Synced $count skills"
+    elif [ "$dir" = "mcp" ]; then
+        # For MCP servers, recursively copy each server directory
+        for server_dir in "$src_dir"/*/; do
+            if [ -d "$server_dir" ]; then
+                local server_name=$(basename "$server_dir")
+                local dest_server_dir="$dest_dir/$server_name"
+
+                # Remove old version and copy fresh
+                rm -rf "$dest_server_dir"
+                cp -r "$server_dir" "$dest_server_dir"
+                count=$((count + 1))
+            fi
+        done
+        log_success "Synced $count MCP servers"
     else
         # For agents and rules, just copy .md files
         for file in "$src_dir"/*.md; do
