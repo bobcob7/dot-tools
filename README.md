@@ -4,7 +4,89 @@ Personal dotfiles and configuration tools.
 
 ## Architecture
 
-[![dot-tools architecture](https://www.plantuml.com/plantuml/png/~1UDfTKprl0Z4CtVCh8dQElGEYecpTAgQgGqZ2aPAFKpveQKL_Uts9Su6J6Eptdfrtjjc4o7nCHfDmLdPWdXdAdHcSbJQ-nQkMr4iUcUsrl9CS63_ttYKhjauxJxzEAaf21e1PB-b2kBYCpkcmeB-4qlSWOngwSFgWBD2S00g_gS0uaRGCgwA7Yfzmgde82nPD-gxW61Vqeam58InOYag7YkQau5op96GbIWRCRUQ6EtjKVNFJY5m1-5IzpLBKmGlRr-Vzowupuku58oeBdnwLxKFt6PojmyW8AevE2-df0aQjTIWFbNWc03iseg34Cu77UGAVmnazwDGhYm9CikJMvb6rMXsA3e8xM3YEzMD4ReHmxPAWYtq0UcSloZjhm1eUmT-gWrLwNfVgEQ9vh-FCfysE2PAmKop94QAuYB9VU0vN2HxoTT7bSftlfcNvO5ewdahBoecq7DiHQ46xRbtSqYTQ3YDv6EVOBtFLxoCD_JERJJzIfNbcctMGXAlHofudGJE2HmOIbpo75Xjf1Vnf_m4t83KS)](https://www.plantuml.com/plantuml/uml/~1UDfTKprl0Z4CtVCh8dQElGEYecpTAgQgGqZ2aPAFKpveQKL_Uts9Su6J6Eptdfrtjjc4o7nCHfDmLdPWdXdAdHcSbJQ-nQkMr4iUcUsrl9CS63_ttYKhjauxJxzEAaf21e1PB-b2kBYCpkcmeB-4qlSWOngwSFgWBD2S00g_gS0uaRGCgwA7Yfzmgde82nPD-gxW61Vqeam58InOYag7YkQau5op96GbIWRCRUQ6EtjKVNFJY5m1-5IzpLBKmGlRr-Vzowupuku58oeBdnwLxKFt6PojmyW8AevE2-df0aQjTIWFbNWc03iseg34Cu77UGAVmnazwDGhYm9CikJMvb6rMXsA3e8xM3YEzMD4ReHmxPAWYtq0UcSloZjhm1eUmT-gWrLwNfVgEQ9vh-FCfysE2PAmKop94QAuYB9VU0vN2HxoTT7bSftlfcNvO5ewdahBoecq7DiHQ46xRbtSqYTQ3YDv6EVOBtFLxoCD_JERJJzIfNbcctMGXAlHofudGJE2HmOIbpo75Xjf1Vnf_m4t83KS)
+[![dot-tools architecture](https://www.plantuml.com/plantuml/png/~1UDfrLCbksp0GlUihMFSijRtcKCHmqbC210rwAeo05YSoQou2EVJI8lts3abJeWi71WpolLdUZ6Puwv4x35er7t0B6jYek3IDtqapSiSrs_1-DpWRZ5XPPHtx-Eq-_YgBtkhH6Z3uZ2S5p46Ft0mAcWOb4Y0ijcYjycpf-gr4ueCZTgJ8V02sk3VeJkp9IeCBzgTXxAS736Fdjsl6FKkNvgroU90Rnzrf4LabDzbd2se4vulN-HePAkcKIoZaZ5p4VRGYAF0fhixd7FkttnPNEaO4TJWMA9uZjfUwG7ICI42f9aNf4j5UyI2WmFbseMDbpQiSieu-dvEEsI3vi9KLi9XZHDDaHpbM3yiVT_UT5bKEBJ973KLf1j_zyjQK5YSayUblIlMyaqfbAJuTpnbY7LPhYUk9Uib0eHti9HmgEWE55f8FD3uLVqRcy0RXU1a_8SMWwphsvJDzAGULKRmcYxShrIm7cjDS3K_7kXe1RPO8RZrP_ASQmMFhWZ4NDX4j5eg6FyHaSAG1H5-PHUfTQT-dqNFJuAM0WyJsODtkLTdSpSY_37EZOtRwUZDNom7dh6ktt0XrOPFmTyKyhfxOCxWzRL3UXdwS1T7scFXahC_CIm6cS6yNutnd-w2fVexIcXHEsFwyMGTfX3tu5i5fQRYA4njnpNlhMndX0j5EjQCAWpG-GPGYFGsiRR-MTMStpDlWUl0LLrRvXYetlcbeXLdNrJx1aqDSusiuvRq6ftM-HkHbkyOKAeggLfOqdmmr12tx-waxlmULQMm-QOT1UepHVFumJNCBHb3R_m7V-k5F)](https://www.plantuml.com/plantuml/uml/~1UDfrLCbksp0GlUihMFSijRtcKCHmqbC210rwAeo05YSoQou2EVJI8lts3abJeWi71WpolLdUZ6Puwv4x35er7t0B6jYek3IDtqapSiSrs_1-DpWRZ5XPPHtx-Eq-_YgBtkhH6Z3uZ2S5p46Ft0mAcWOb4Y0ijcYjycpf-gr4ueCZTgJ8V02sk3VeJkp9IeCBzgTXxAS736Fdjsl6FKkNvgroU90Rnzrf4LabDzbd2se4vulN-HePAkcKIoZaZ5p4VRGYAF0fhixd7FkttnPNEaO4TJWMA9uZjfUwG7ICI42f9aNf4j5UyI2WmFbseMDbpQiSieu-dvEEsI3vi9KLi9XZHDDaHpbM3yiVT_UT5bKEBJ973KLf1j_zyjQK5YSayUblIlMyaqfbAJuTpnbY7LPhYUk9Uib0eHti9HmgEWE55f8FD3uLVqRcy0RXU1a_8SMWwphsvJDzAGULKRmcYxShrIm7cjDS3K_7kXe1RPO8RZrP_ASQmMFhWZ4NDX4j5eg6FyHaSAG1H5-PHUfTQT-dqNFJuAM0WyJsODtkLTdSpSY_37EZOtRwUZDNom7dh6ktt0XrOPFmTyKyhfxOCxWzRL3UXdwS1T7scFXahC_CIm6cS6yNutnd-w2fVexIcXHEsFwyMGTfX3tu5i5fQRYA4njnpNlhMndX0j5EjQCAWpG-GPGYFGsiRR-MTMStpDlWUl0LLrRvXYetlcbeXLdNrJx1aqDSusiuvRq6ftM-HkHbkyOKAeggLfOqdmmr12tx-waxlmULQMm-QOT1UepHVFumJNCBHb3R_m7V-k5F)
+
+<details>
+<summary>PlantUML source</summary>
+
+```plantuml
+@startuml
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title dot-tools Architecture
+
+package "Entry Point" {
+  [setup.sh] as setup
+}
+
+package "Library" as lib {
+  [helpers.sh] as helpers
+  [playground.sh] as playground
+}
+
+package "Modules" as modules {
+  [zsh.sh] as zsh
+  [tmux.sh] as tmux
+  [vim.sh] as vim
+  [utils.sh] as utils
+  [claude.sh] as claude
+}
+
+package "Configs" as configs {
+  package "Claude Code" as claudeconf {
+    [CLAUDE.md] as claudemd
+    [settings.json] as settings
+
+    package "Skills" as skills {
+      [commit] as skill_commit
+      [review] as skill_review
+      [diagram] as skill_diagram
+      [context] as skill_context
+      [... 10 more] as skill_more
+    }
+
+    package "Agents" as agents {
+      [code-reviewer] as agent_review
+      [test-runner] as agent_test
+      [language experts] as agent_lang
+    }
+
+    package "Rules" as rules {
+      [git-workflow] as rule_git
+      [testing] as rule_test
+      [error-handling] as rule_error
+    }
+
+    package "MCP Servers" as mcp {
+      [plantuml] as mcp_plantuml
+    }
+  }
+}
+
+package "Documentation" as docs {
+  [windows-terminal.md]
+  [macos-iterm.md]
+  [vim-plugins.md]
+}
+
+setup --> helpers : sources
+setup --> modules : runs
+
+zsh ..> helpers : uses
+tmux ..> helpers : uses
+vim ..> helpers : uses
+utils ..> helpers : uses
+claude ..> helpers : uses
+
+claude --> claudeconf : syncs to ~/.claude
+claude --> mcp : registers servers
+
+@enduml
+```
+
+</details>
 
 ## Documentation
 
