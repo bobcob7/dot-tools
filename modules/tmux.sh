@@ -29,66 +29,70 @@ setup_tmux() {
         log_success "Installed Oh My Tmux"
     fi
 
-    # Create/update local config with customizations
+    # Create local config from template and apply customizations
     local tmux_local="$HOME/.tmux.conf.local"
-    local marker="# DOT-TOOLS MANAGED"
+    local template="$HOME/.tmux/.tmux.conf.local"
 
-    # Copy the default local config if it doesn't exist
-    if [ ! -f "$tmux_local" ]; then
-        if [ -f "$HOME/.tmux/.tmux.conf.local" ]; then
-            log_info "Creating tmux local config from template..."
-            cp "$HOME/.tmux/.tmux.conf.local" "$tmux_local"
-        else
-            log_warn "Oh My Tmux template not found"
-            return 0
-        fi
+    if [[ ! -f "$template" ]]; then
+        log_warn "Oh My Tmux template not found"
+        return 0
     fi
 
-    # Apply Dracula theme colors (modify in place - Oh My Tmux reads these before EOF)
-    log_info "Applying Dracula theme colors..."
-    sed -i \
-        -e 's/^tmux_conf_theme_colour_1=.*/tmux_conf_theme_colour_1="default"    # transparent/' \
-        -e 's/^tmux_conf_theme_colour_2=.*/tmux_conf_theme_colour_2="#44475a"    # dracula current line/' \
-        -e 's/^tmux_conf_theme_colour_3=.*/tmux_conf_theme_colour_3="#f8f8f2"    # dracula foreground/' \
-        -e 's/^tmux_conf_theme_colour_4=.*/tmux_conf_theme_colour_4="#bd93f9"    # dracula purple/' \
-        -e 's/^tmux_conf_theme_colour_5=.*/tmux_conf_theme_colour_5="#ff79c6"    # dracula pink/' \
-        -e 's/^tmux_conf_theme_colour_6=.*/tmux_conf_theme_colour_6="#282a36"    # dracula background/' \
-        -e 's/^tmux_conf_theme_colour_7=.*/tmux_conf_theme_colour_7="#f8f8f2"    # dracula foreground/' \
-        -e 's/^tmux_conf_theme_colour_8=.*/tmux_conf_theme_colour_8="#282a36"    # dracula background/' \
-        -e 's/^tmux_conf_theme_colour_9=.*/tmux_conf_theme_colour_9="#bd93f9"    # dracula purple/' \
-        -e 's/^tmux_conf_theme_colour_10=.*/tmux_conf_theme_colour_10="#ff79c6"  # dracula pink/' \
-        -e 's/^tmux_conf_theme_colour_11=.*/tmux_conf_theme_colour_11="#50fa7b"  # dracula green/' \
-        -e 's/^tmux_conf_theme_colour_12=.*/tmux_conf_theme_colour_12="#6272a4"  # dracula comment/' \
-        -e 's/^tmux_conf_theme_colour_13=.*/tmux_conf_theme_colour_13="#f8f8f2"  # dracula foreground/' \
-        -e 's/^tmux_conf_theme_colour_14=.*/tmux_conf_theme_colour_14="#282a36"  # dracula background/' \
-        -e 's/^tmux_conf_theme_colour_15=.*/tmux_conf_theme_colour_15="default"  # transparent/' \
-        -e 's/^tmux_conf_theme_colour_16=.*/tmux_conf_theme_colour_16="#ff5555"  # dracula red/' \
-        -e 's/^tmux_conf_theme_colour_17=.*/tmux_conf_theme_colour_17="#f8f8f2"  # dracula foreground/' \
-        "$tmux_local"
-    log_success "Applied Dracula theme"
+    log_info "Creating tmux local config with Dracula theme..."
 
-    # Add custom settings at end (only if not already present)
-    if ! grep -qF "$marker" "$tmux_local"; then
-        log_info "Adding custom tmux settings..."
+    # Start with template
+    cp "$template" "$tmux_local"
+
+    # Replace theme colors in place with Dracula theme
+    # Use sed -i.bak for macOS compatibility, then remove backup
+    sed -i.bak \
+        -e 's/^tmux_conf_theme_colour_1=.*/tmux_conf_theme_colour_1="default"/' \
+        -e 's/^tmux_conf_theme_colour_2=.*/tmux_conf_theme_colour_2="#44475a"/' \
+        -e 's/^tmux_conf_theme_colour_3=.*/tmux_conf_theme_colour_3="#f8f8f2"/' \
+        -e 's/^tmux_conf_theme_colour_4=.*/tmux_conf_theme_colour_4="#bd93f9"/' \
+        -e 's/^tmux_conf_theme_colour_5=.*/tmux_conf_theme_colour_5="#ff79c6"/' \
+        -e 's/^tmux_conf_theme_colour_6=.*/tmux_conf_theme_colour_6="#282a36"/' \
+        -e 's/^tmux_conf_theme_colour_7=.*/tmux_conf_theme_colour_7="#f8f8f2"/' \
+        -e 's/^tmux_conf_theme_colour_8=.*/tmux_conf_theme_colour_8="#282a36"/' \
+        -e 's/^tmux_conf_theme_colour_9=.*/tmux_conf_theme_colour_9="#bd93f9"/' \
+        -e 's/^tmux_conf_theme_colour_10=.*/tmux_conf_theme_colour_10="#ff79c6"/' \
+        -e 's/^tmux_conf_theme_colour_11=.*/tmux_conf_theme_colour_11="#50fa7b"/' \
+        -e 's/^tmux_conf_theme_colour_12=.*/tmux_conf_theme_colour_12="#6272a4"/' \
+        -e 's/^tmux_conf_theme_colour_13=.*/tmux_conf_theme_colour_13="#f8f8f2"/' \
+        -e 's/^tmux_conf_theme_colour_14=.*/tmux_conf_theme_colour_14="#282a36"/' \
+        -e 's/^tmux_conf_theme_colour_15=.*/tmux_conf_theme_colour_15="default"/' \
+        -e 's/^tmux_conf_theme_colour_16=.*/tmux_conf_theme_colour_16="#ff5555"/' \
+        -e 's/^tmux_conf_theme_colour_17=.*/tmux_conf_theme_colour_17="#f8f8f2"/' \
+        "$tmux_local"
+    rm -f "${tmux_local}.bak"
+
+    # Append custom settings (only if not already present)
+    if ! grep -q "# DOT-TOOLS: Custom settings" "$tmux_local"; then
         cat >> "$tmux_local" << 'EOF'
 
-# DOT-TOOLS MANAGED - Custom additions below
-# Use zsh as default shell
+# DOT-TOOLS: Custom settings
 set -g default-shell /bin/zsh
-
-# Increase history limit
 set -g history-limit 50000
-
-# Enable mouse support
 set -g mouse on
-
-# Enable 256 colors and true color
 set -g default-terminal "tmux-256color"
 set -ga terminal-overrides ",*256col*:Tc"
 EOF
-        log_success "Added custom tmux settings"
+    fi
+
+    log_success "Created tmux config with Dracula theme"
+
+    # Reload tmux config if running inside tmux
+    if [[ -n "$TMUX" ]]; then
+        log_info "Reloading tmux configuration..."
+        # Source local config first (sets env vars), then reapply theme
+        # The full config source unsets vars after theme is applied, so we re-source local before _apply_theme
+        tmux source-file ~/.tmux.conf 2>/dev/null \
+            && tmux source-file ~/.tmux.conf.local 2>/dev/null \
+            && tmux run 'cut -c3- "$TMUX_CONF" | sh -s _apply_theme' 2>/dev/null \
+            && log_success "Tmux config reloaded" \
+            || log_warn "Could not reload tmux config"
     else
-        log_success "Custom tmux settings already present"
+        log_info "Run 'tmux source ~/.tmux.conf' or press prefix+R to reload"
     fi
 
     log_success "Tmux setup complete"
