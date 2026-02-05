@@ -70,7 +70,7 @@ install_dracula_theme() {
 
     # Set theme in .zshrc
     if grep -q '^ZSH_THEME=' "$HOME/.zshrc"; then
-        sed -i 's/^ZSH_THEME=.*/ZSH_THEME="dracula"/' "$HOME/.zshrc"
+        sed -i.bak 's/^ZSH_THEME=.*/ZSH_THEME="dracula"/' "$HOME/.zshrc"
         log_success "Set Dracula as zsh theme"
     fi
 }
