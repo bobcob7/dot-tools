@@ -35,8 +35,9 @@ Create a PlantUML diagram and optionally add it to a markdown file.
 
 4. **If a target file is specified**, add the diagram to it:
    - Insert image as a clickable link to the editor: `[![description](png-url)](editor-url)`
+   - The alt text should be a human-friendly summary of what the diagram shows
    - The PNG renders inline in documentation; clicking it opens the PlantUML editor
-   - Add collapsible source in a `<details>` block
+   - Do NOT add `<details>` blocks or other non-standard markdown
 
 5. **Show the user**:
    - The generated URLs (png, svg, editor)
@@ -82,18 +83,7 @@ class Entity {
 
 ## Output Format
 
-When adding to a file, wrap the image in a link to the editor so it renders inline and opens the editor on click:
+When adding to a file, use a linked image with descriptive alt text. Do NOT include `<details>` blocks or inline PlantUML source — the editor link serves as the source reference:
 ```markdown
-[![Diagram description](https://www.plantuml.com/plantuml/png/~1...)](https://www.plantuml.com/plantuml/uml/~1...)
-
-<details>
-<summary>PlantUML source</summary>
-
-\`\`\`plantuml
-@startuml
-...
-@enduml
-\`\`\`
-
-</details>
+[![Human-friendly description of what the diagram shows](https://www.plantuml.com/plantuml/png/~1...)](https://www.plantuml.com/plantuml/uml/~1...)
 ```
