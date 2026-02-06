@@ -21,6 +21,7 @@ Validate that all non-git-ignored directories have valid `.context.md` files.
    - `## Purpose` - Describes the directory's role
    - `## Functionality` - Lists external features/capabilities
    - `## Files` - Documents files in the directory
+   - `## TODO` - Outstanding tasks with priorities (P0-P3)
 
 4. Report findings:
    - List directories missing `.context.md`
@@ -53,6 +54,15 @@ High-level description of functionality this directory provides externally:
 |------|-------------|
 | `file1.ts` | Brief description |
 | `file2.ts` | Brief description |
+
+## TODO
+
+| Priority | Task |
+|----------|------|
+| P0 | Critical tasks that block other work |
+| P1 | Important tasks for core functionality |
+| P2 | Nice-to-have improvements |
+| P3 | Future/low-priority items |
 ```
 
 ## Options

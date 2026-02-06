@@ -34,7 +34,18 @@ High-level description of functionality this directory provides externally:
 |------|-------------|
 | `file1.ts` | Brief description of what this file does |
 | `file2.ts` | Brief description of what this file does |
+
+## TODO
+
+| Priority | Task |
+|----------|------|
+| P0 | Critical tasks that block other work |
+| P1 | Important tasks for core functionality |
+| P2 | Nice-to-have improvements |
+| P3 | Future/low-priority items |
 ```
+
+The TODO section tracks outstanding work with priorities (P0 = critical, P3 = low). Update it when tasks are completed or new work is identified.
 
 ### Maintaining Context Files
 
@@ -64,15 +75,30 @@ When you add, remove, or significantly modify files in a directory:
 
 ## Languages
 
+### Go
+- No blank lines inside functions
+- Interfaces defined at the consumer, not the implementor
+- All interfaces in a package go in `interfaces.go` — one file, not scattered
+- Use moq for mock generation — generated into `moq_test.go` (same package)
+- Unexported by default — only export what other packages need
+- Unexported error sentinels (`errNotFound`, not `ErrNotFound`) unless needed externally
+- Constructor injection, wire in `main()`
+- Use `slog` for structured logging, pass `*slog.Logger` via constructor
+- Track tool versions in `go.mod` via a `tools.go` file with `//go:build tools` tag
+
+### TypeScript/React
+- Named exports only — no default exports
+- `strict: true` and `noUncheckedIndexedAccess: true` in tsconfig
+- Prefer `const` over `let`
+- Use arrow functions for callbacks
+- Prefer async/await over raw promises
+- CSS Modules for component styling
+- Redux Toolkit for state management (createSlice, createAsyncThunk)
+
 ### Shell/Bash
 - Use `[[ ]]` for conditionals over `[ ]`
 - Quote variables: `"$var"` not `$var`
 - Use `local` for function variables
-
-### JavaScript/TypeScript
-- Prefer `const` over `let` where possible
-- Use arrow functions for callbacks
-- Prefer async/await over raw promises
 
 ### Python
 - Follow PEP 8
@@ -81,6 +107,21 @@ When you add, remove, or significantly modify files in a directory:
 
 ## Testing
 
+### General
 - Write tests for new functionality
 - Keep tests focused on one behavior
 - Use descriptive test names that explain what's being tested
+
+### Go Tests
+- Always use `t.Parallel()` on tests and subtests
+- Always use `t.Context()` instead of `context.Background()`
+- Always use `slog.New(slog.NewJSONHandler(io.Discard, nil))` for loggers in tests
+- Use `require` for preconditions, `assert` for verifications
+- Use moq-generated mocks — never hand-write mocks
+
+### Frontend Tests
+- Vitest + React Testing Library + @testing-library/jest-dom
+- Setup file with `cleanup()` after each test
+- Wrap MUI components in ThemeProvider
+- Wrap router components in MemoryRouter
+- Test Redux slices by calling reducer directly with actions

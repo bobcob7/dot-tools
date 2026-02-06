@@ -17,16 +17,6 @@ Good test names describe:
 - Under what conditions
 - Expected outcome
 
-```javascript
-// Good
-test("formatDate returns ISO string for valid Date object")
-test("parseUser throws when email is missing")
-
-// Bad
-test("formatDate works")
-test("test1")
-```
-
 ## What to Test
 
 - Happy path behavior
@@ -45,3 +35,17 @@ test("test1")
 - Mock external dependencies (APIs, databases)
 - Don't mock the code under test
 - Keep mocks minimal and focused
+
+## Go-Specific
+
+- See `go-standards.md` for full Go testing rules
+- Always `t.Parallel()`, `t.Context()`, `io.Discard` logger
+- Use moq-generated mocks from `moq_test.go` (same package)
+- `require` for preconditions, `assert` for verifications
+
+## Frontend-Specific
+
+- See `typescript-standards.md` for full frontend testing rules
+- Vitest + React Testing Library + @testing-library/jest-dom
+- Always cleanup between tests via setup file
+- Wrap components in required providers (Theme, Router, Redux)

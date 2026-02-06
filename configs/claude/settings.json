@@ -26,5 +26,11 @@
       "Read(**/credentials*)",
       "Read(**/*secret*)"
     ]
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "linear@claude-plugins-official": true
   }
 }

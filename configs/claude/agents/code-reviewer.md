@@ -41,6 +41,26 @@ When delegated code review tasks:
 - Duplication
 - Coupling and cohesion
 
+## Project Convention Checks
+
+### Go
+- No blank lines inside functions
+- Interfaces in `interfaces.go`, defined at consumer
+- Unexported by default
+- Error sentinels unexported (`errNotFound`)
+- Moq mocks in `moq_test.go` (same package), not `mocks/` subdir
+- Tests use `t.Parallel()`, `t.Context()`, `io.Discard` logger
+
+### TypeScript/React
+- Named exports only (no default exports)
+- CSS Modules for styling (not inline styles)
+- Redux Toolkit patterns (createSlice, createAsyncThunk)
+- Vitest tests with proper provider wrapping
+
+### Context Files
+- Every directory should have `.context.md`
+- Must include TODO section with priorities (P0-P3)
+
 ## Output Style
 
 - Be direct and specific
