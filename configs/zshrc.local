@@ -35,30 +35,6 @@ setopt HIST_VERIFY            # Show command before executing from history
 setopt HIST_REDUCE_BLANKS     # Remove extra blanks from commands
 
 # ============================================
-# Dracula Syntax Highlighting Colors
-# ============================================
-# These colors match the Dracula theme palette
-typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[command]='fg=#50fa7b'           # green
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#8be9fd'           # cyan
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#50fa7b'             # green
-ZSH_HIGHLIGHT_STYLES[function]='fg=#50fa7b'          # green
-ZSH_HIGHLIGHT_STYLES[path]='fg=#f8f8f2,underline'    # foreground
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=#f1fa8c'          # yellow
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#f1fa8c'  # yellow
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#f1fa8c'  # yellow
-ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=#f1fa8c'  # yellow
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#ff5555'     # red
-ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#ff79c6'     # pink
-ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=#ff79c6'  # pink
-ZSH_HIGHLIGHT_STYLES[redirection]='fg=#bd93f9'       # purple
-ZSH_HIGHLIGHT_STYLES[assign]='fg=#f8f8f2'            # foreground
-ZSH_HIGHLIGHT_STYLES[comment]='fg=#6272a4'           # comment gray
-
-# Autosuggestions color (muted)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6272a4'
-
-# ============================================
 # Tmux Auto-Start
 # ============================================
 # Start tmux automatically if:
@@ -71,4 +47,14 @@ if command -v tmux &> /dev/null; then
         # Attach to existing session or create new one
         tmux attach-session -t main 2>/dev/null || tmux new-session -s main
     fi
+fi
+
+# ============================================
+# LOCAL BIN PATH
+# ============================================
+if [[ -d "$HOME/.local/bin" && ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+if [[ -d "/usr/local/go/bin" ]]; then
+    export PATH="/usr/local/go/bin:$PATH"
 fi

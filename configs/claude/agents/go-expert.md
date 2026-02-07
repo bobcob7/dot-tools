@@ -28,11 +28,30 @@ You are a Go language expert with deep knowledge of idiomatic Go patterns.
 ## Code Style
 
 Follow Effective Go and Go Code Review Comments:
-- Use `gofmt` formatting
+- Use `gofumpt` formatting (stricter than `gofmt`)
 - Short variable names in small scopes
 - CamelCase for exported, camelCase for unexported
-- Error variables: `errSomething` or `ErrSomething`
-- Interface names: `-er` suffix when single method
+- **No blank lines inside functions**
+- Prefer early returns over deep nesting
+- Context is always the first parameter
+
+## Project Conventions
+
+- **Interfaces**: All in `interfaces.go` per package, defined at the consumer
+- **Mocking**: moq-generated into `moq_test.go` (same package). Directive: `//go:generate moq -out moq_test.go . iface1 iface2`
+- **Error sentinels**: Unexported by default (`errNotFound`, not `ErrNotFound`)
+- **Visibility**: Unexported by default — only export what other packages need
+- **DI**: Constructor injection, wire in `main()`
+- **Tools**: Tracked in `internal/tools/tools.go` with `//go:build tools` tag, versions from `go.mod`
+
+## Testing Conventions
+
+- Always use `t.Parallel()` on tests and subtests
+- Always use `t.Context()` instead of `context.Background()`
+- Always use `slog.New(slog.NewJSONHandler(io.Discard, nil))` for loggers
+- Use `require` for preconditions, `assert` for verifications
+- testify + subtests
+- `make generate` must run before tests (generates moq_test.go)
 
 ## Common Patterns
 
@@ -47,3 +66,4 @@ Follow Effective Go and Go Code Review Comments:
 - `go build`, `go test`, `go mod`
 - `golangci-lint` for linting
 - `go vet` for static analysis
+- `make generate` for code generation (buf, sqlc, moq)

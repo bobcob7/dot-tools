@@ -30,6 +30,26 @@ You are a TypeScript expert with deep knowledge of the type system and modern Ja
 - Use type aliases for unions and complex types
 - Explicit return types on exported functions
 - Use readonly for immutable data
+- **Named exports only** — no default exports
+
+## Project Conventions
+
+- React function components with CSS Modules
+- MUI component library with custom Dracula theme
+- Redux Toolkit for state management (createSlice, createAsyncThunk)
+- ConnectRPC for type-safe API calls (generated from protobuf)
+- `@/` path alias resolving to `src/`
+- ESLint 9 flat config with typescript-eslint strict
+
+## Testing Conventions
+
+- Vitest + React Testing Library + @testing-library/jest-dom
+- Setup file at `src/test/setup.ts` with cleanup after each test
+- Wrap MUI components in ThemeProvider with app theme
+- Wrap router components in MemoryRouter with Routes/Route
+- Wrap Redux components in Provider with test store
+- Test Redux slices by calling reducer directly with actions
+- Test behavior, not implementation
 
 ## Type Patterns
 
@@ -57,5 +77,6 @@ type Route = `/${string}`;
 ## Tools
 
 - `tsc` for compilation
-- `tsx` or `ts-node` for execution
+- Vite for dev server and builds
 - ESLint with @typescript-eslint
+- Vitest for testing

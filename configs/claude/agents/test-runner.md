@@ -18,11 +18,24 @@ When delegated testing tasks:
 ## Test Detection
 
 Check for these in order:
-- `package.json` scripts (npm test, jest, vitest, mocha)
-- `Makefile` targets (make test)
+- `Makefile` targets (make test) — preferred when available
+- `package.json` scripts (npm test, vitest)
+- `go.mod` (go test ./...)
 - `pytest.ini` or `pyproject.toml` (pytest)
 - `Cargo.toml` (cargo test)
-- `go.mod` (go test)
+
+## Language-Specific Notes
+
+### Go
+- Run `make generate` before tests if moq_test.go files are missing
+- Tests use `t.Parallel()` — failures may be concurrent
+- Mocks are moq-generated in `moq_test.go` (same package)
+- Use `-count=1` to bypass test caching
+
+### Frontend (Vitest)
+- Run from web/ directory: `npm test`
+- Setup file at `src/test/setup.ts` handles cleanup
+- Component tests need provider wrapping (Theme, Router, Redux)
 
 ## On Failure
 

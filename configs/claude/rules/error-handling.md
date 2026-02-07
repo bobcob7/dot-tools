@@ -33,6 +33,18 @@ function process(data) {
 - Include relevant context in error messages
 - Don't expose internal details to end users
 
+## Go-Specific
+
+- Unexported sentinel errors: `errNotFound` (not `ErrNotFound`) unless externally needed
+- Wrap with context: `fmt.Errorf("doing X: %w", err)`
+- Match with `errors.Is` / `errors.As` at handler boundaries
+- Map domain errors to ConnectRPC codes in handlers:
+  ```go
+  if errors.Is(err, errNotFound) {
+      return nil, connect.NewError(connect.CodeNotFound, err)
+  }
+  ```
+
 ## Anti-patterns to Avoid
 
 - Empty catch blocks
