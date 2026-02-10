@@ -4,6 +4,7 @@
 import json
 import sys
 import zlib
+from typing import Optional
 
 BASE_URL = "https://www.plantuml.com/plantuml"
 ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
@@ -47,7 +48,7 @@ def generate_urls(diagram: str) -> dict:
     }
 
 
-def handle_request(req: dict) -> dict | None:
+def handle_request(req: dict) -> Optional[dict]:
     """Handle a JSON-RPC request."""
     method = req.get("method")
     req_id = req.get("id")
