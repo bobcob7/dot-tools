@@ -128,5 +128,22 @@ EOF
         log_success "~/.local/bin already in PATH config"
     fi
 
+    # Source playground functions in shell
+    if ! grep -qF "PLAYGROUND FUNCTIONS" "$zshrc_local" 2>/dev/null; then
+        log_info "Adding playground functions to shell..."
+        cat >> "$zshrc_local" << EOF
+
+# ============================================
+# PLAYGROUND FUNCTIONS
+# ============================================
+if [[ -f "$DOTFILES_DIR/lib/playground.sh" ]]; then
+    source "$DOTFILES_DIR/lib/playground.sh"
+fi
+EOF
+        log_success "Added playground functions"
+    else
+        log_success "Playground functions already configured"
+    fi
+
     log_success "Utilities setup complete"
 }
