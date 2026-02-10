@@ -98,7 +98,6 @@ install_claude_plugins() {
         "typescript-lsp"
         "gopls-lsp"
         "playwright"
-        "linear"
     )
 
     for plugin in "${plugins[@]}"; do
