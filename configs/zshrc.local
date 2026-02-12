@@ -8,6 +8,70 @@
 # Plugin is enabled in .zshrc plugins array
 
 # ============================================
+# Merged History Search (fzf + per-directory-history)
+# ============================================
+# Ctrl+R shows both directory and global history in fzf
+# Cyan = ran in current directory, Gray = ran elsewhere
+# Falls back to default reverse search if fzf is not installed
+
+_dot_tools_reverse() {
+    if command -v tac &>/dev/null; then
+        tac "$@"
+    else
+        tail -r "$@"
+    fi
+}
+
+_fzf_merged_history_widget() {
+    if ! command -v fzf &>/dev/null; then
+        zle history-incremental-search-backward
+        return
+    fi
+    local dir_hist="${PER_DIRECTORY_HISTORY_BASE:-$HOME/.directory_history}${PWD:A}"
+    local global_hist="${HISTFILE:-$HOME/.zsh_history}"
+    [[ ! -f "$global_hist" ]] && return
+    local selected
+    selected=$(
+        {
+            [[ -f "$dir_hist" ]] && cat "$dir_hist"
+            echo "__DOT_TOOLS_HIST_SEP__"
+            [[ -f "$dir_hist" ]] && _dot_tools_reverse "$dir_hist"
+            _dot_tools_reverse "$global_hist"
+        } | awk '
+            function clean(line) {
+                sub(/^: [0-9]+:[0-9]+;/, "", line)
+                return line
+            }
+            /^__DOT_TOOLS_HIST_SEP__$/ { past_sep = 1; next }
+            !past_sep {
+                cmd = clean($0)
+                if (cmd != "") local_cmds[cmd] = 1
+            }
+            past_sep {
+                cmd = clean($0)
+                if (cmd != "" && !seen[cmd]++) {
+                    if (cmd in local_cmds)
+                        printf "\033[36m%s\033[0m\n", cmd
+                    else
+                        printf "\033[90m%s\033[0m\n", cmd
+                }
+            }
+        ' | fzf --ansi --no-sort \
+              --query="${LBUFFER}" \
+              --header="cyan=local  gray=global" \
+              --tiebreak=index \
+              --height=40% \
+              --reverse
+    )
+    if [[ -n "$selected" ]]; then
+        LBUFFER="$selected"
+    fi
+    zle reset-prompt
+}
+zle -N _fzf_merged_history_widget
+bindkey '^R' _fzf_merged_history_widget
+
+# ============================================
 # Useful Aliases
 # ============================================
 

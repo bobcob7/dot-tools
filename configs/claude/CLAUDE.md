@@ -43,7 +43,11 @@ High-level description of functionality this directory provides externally:
 | P1 | Important tasks for core functionality |
 | P2 | Nice-to-have improvements |
 | P3 | Future/low-priority items |
+
+<!-- updated-at: <git-ref> -->
 ```
+
+The `<!-- updated-at: ... -->` comment must always be the last line. Replace `<git-ref>` with the short output of `git rev-parse --short HEAD`. This tracks when the file was last updated so staleness can be detected via `git diff`.
 
 The TODO section tracks outstanding work with priorities (P0 = critical, P3 = low). Update it when tasks are completed or new work is identified.
 
@@ -53,6 +57,7 @@ When you add, remove, or significantly modify files in a directory:
 - Update the corresponding `.context.md` file
 - Keep descriptions concise but informative
 - Focus on external interfaces and purpose, not implementation details
+- Update the `<!-- updated-at: ... -->` ref to the current HEAD
 
 ## General
 

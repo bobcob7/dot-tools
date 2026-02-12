@@ -98,6 +98,14 @@ setup_zsh() {
         log_success "Oh-My-Zsh is already installed"
     fi
 
+    # Install fzf (used for merged history search)
+    if ! command_exists fzf; then
+        log_info "Installing fzf..."
+        install_package fzf
+    else
+        log_success "fzf is already installed"
+    fi
+
     # Install external plugins
     for entry in "${OMZ_EXTERNAL_PLUGINS[@]}"; do
         if [ -n "$entry" ]; then
