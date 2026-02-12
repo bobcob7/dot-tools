@@ -37,8 +37,12 @@ You are implementing plans from the plans/ directory, one per iteration.
 
 2. **Find the next plan:**
    - Read plans/.context.md
-   - Find the first plan in the files table that is NOT marked ~~DONE~~ and whose dependencies (from the dependency graph) are ALL marked ~~DONE~~
-   - If no eligible plan exists, output <promise>ALL PLANS COMPLETE</promise> and stop
+   - List open PRs: gh pr list --state open --json headRefName --jq '.[].headRefName'
+   - Find the first plan in the files table that:
+     - Is NOT marked ~~DONE~~
+     - Does NOT have an open PR with branch feat/<plan-name>
+     - Has all dependencies marked ~~DONE~~
+   - If no eligible plan exists (all are either done or have open PRs), output <promise>ALL PLANS COMPLETE</promise> and stop
 
 3. **Read and implement the plan:**
    - Read the full plan file
@@ -56,9 +60,13 @@ You are implementing plans from the plans/ directory, one per iteration.
    - Commit with message: feat: Implement <plan-name> - <short description>
    - Push the branch
    - Create a PR with gh pr create, referencing the plan file in the description
-   - Return to the default branch
 
-6. **Verify iteration:**
+6. **Review the PR:**
+   - Run gh pr review --approve with a summary of what was implemented and verified
+   - Do NOT wait for checks — do NOT merge the PR — leave it for manual review
+
+7. **Verify iteration:**
+   - Return to the default branch
    - Confirm you are back on the default branch
    - Confirm working tree is clean
    - Proceed to the next iteration
@@ -69,6 +77,10 @@ You are implementing plans from the plans/ directory, one per iteration.
 
 - Each iteration implements exactly one plan
 - Plans are selected in dependency order — blocked plans are skipped until their deps are done
-- The loop terminates when all plans are complete or after 50 iterations
+- Plans with open PRs are skipped (already in flight, awaiting manual merge)
+- Dependent plans remain blocked until their dependency PRs are merged (making deps ~~DONE~~ on the default branch)
+- Independent plans can be implemented in parallel across iterations while earlier PRs await merge
+- The loop terminates when all plans are either done or have open PRs, or after 50 iterations
 - Each plan gets its own feature branch and PR
+- PRs are agent-reviewed but NOT auto-merged — they require manual review
 - Use `/cancel-ralph` to stop the loop early if needed
