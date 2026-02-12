@@ -1,5 +1,5 @@
 ---
-name: updated-context
+name: update-context
 description: Scan, validate, and incrementally update .context.md files using git diff
 allowed-tools: Bash, Read, Write, Glob, Grep, Edit
 ---
