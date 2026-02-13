@@ -27,6 +27,7 @@ setup_claude() {
     sync_claude_file "settings.json"
     sync_claude_dir "skills"
     sync_claude_dir "agents"
+    sync_claude_dir "commands"
     sync_claude_dir "rules"
     sync_claude_dir "mcp"
 

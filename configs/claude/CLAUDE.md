@@ -1,64 +1,44 @@
 # User Preferences
 
-## Directory Context Files
+## Directory Context
 
-When working in this codebase, use `.context.md` files to understand directory structure and purpose. These files provide essential documentation for each directory.
+Projects use structured context stored via the `sudo-context` MCP server. This provides machine-readable context about every directory — what it does, its strengths/weaknesses, dependencies, test coverage, and file inventory.
 
-### Reading Context Files
+### Exploring with Context (query_context)
 
-Before modifying code in a directory, check for a `.context.md` file and read it to understand:
-- The directory's purpose and relationship to the project
-- Available functionality and APIs
-- What each file does
+**Before reading files in an unfamiliar directory**, call `query_context` to get structured context:
 
-### Creating Context Files
-
-**When creating a new directory, always create a `.context.md` file** with these sections:
-
-```markdown
-# Directory Name
-
-## Purpose
-
-Describe the overall role of this directory and how it relates to the rest of the project.
-
-## Functionality
-
-High-level description of functionality this directory provides externally:
-- Feature or capability 1
-- Feature or capability 2
-
-## Files
-
-| File | Description |
-|------|-------------|
-| `file1.ts` | Brief description of what this file does |
-| `file2.ts` | Brief description of what this file does |
-
-## TODO
-
-| Priority | Task |
-|----------|------|
-| P0 | Critical tasks that block other work |
-| P1 | Important tasks for core functionality |
-| P2 | Nice-to-have improvements |
-| P3 | Future/low-priority items |
-
-<!-- updated-at: <git-ref> -->
+```
+query_context(project_root=<abs_path>, directory=<relative_path>)
 ```
 
-The `<!-- updated-at: ... -->` comment must always be the last line. Replace `<git-ref>` with the short output of `git rev-parse --short HEAD`. This tracks when the file was last updated so staleness can be detected via `git diff`.
+This returns sections including `description`, `purpose`, `functionality`, `files`, `strengths`, `weaknesses`, `test_coverage`, and `dependencies`. Use this to orient yourself before diving into code.
 
-The TODO section tracks outstanding work with priorities (P0 = critical, P3 = low). Update it when tasks are completed or new work is identified.
+You can filter to specific sections for efficiency:
 
-### Maintaining Context Files
+```
+query_context(project_root=<abs_path>, directory="lib/utils", sections=["purpose", "files"])
+```
 
-When you add, remove, or significantly modify files in a directory:
-- Update the corresponding `.context.md` file
-- Keep descriptions concise but informative
-- Focus on external interfaces and purpose, not implementation details
-- Update the `<!-- updated-at: ... -->` ref to the current HEAD
+### Auditing Context (check_context_status)
 
+To understand what's documented vs not across the whole project:
+
+```
+check_context_status(project_root=<abs_path>)
+```
+
+Returns three lists: `needs_creation` (undocumented dirs), `needs_update` (stale docs), `needs_deletion` (orphaned docs). Use `/update-context` to fix these.
+
+### Writing Context (upsert_context)
+
+After modifying code in a directory, update its context:
+
+```
+upsert_context(project_root=<abs_path>, repo=<owner/repo>, git_ref=<short_ref>, directory=<path>, sections={...})
+```
+
+Sections merge — you only need to pass the sections that changed. The 8 required section keys are: `description`, `purpose`, `strengths`, `weaknesses`, `test_coverage`, `dependencies`, `functionality`, `files`.
 ## General
 
 - Prefer concise responses over verbose explanations

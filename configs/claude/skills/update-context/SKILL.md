@@ -1,129 +1,114 @@
 ---
 name: update-context
-description: Scan, validate, and incrementally update .context.md files using git diff
-allowed-tools: Bash, Read, Write, Glob, Grep, Edit
+description: Scan, validate, and update directory context using sudo-context MCP tools
+argument-hint: "[directory or blank for full scan]"
+allowed-tools: Bash, Read, Glob, Grep
 ---
 
-Scan all non-git-ignored directories for `.context.md` files. Detect staleness using stored git refs, and use `git diff` for incremental updates instead of regenerating from scratch.
+Scan all directories in the project for context completeness and staleness. Update or create context using the `sudo-context` MCP tools (`upsert_context`, `query_context`, `check_context_status`).
+
+If `$ARGUMENTS` specifies a directory, only process that directory. Otherwise, run a full scan.
+
+## Required Sections
+
+Every directory context must include these 8 sections:
+
+| Section Key | Content |
+|-------------|---------|
+| `description` | Single-sentence summary of what this directory is |
+| `purpose` | Why this directory exists and its role in the project |
+| `strengths` | What this directory does well |
+| `weaknesses` | Known limitations, tech debt, or design issues |
+| `test_coverage` | What's tested, what's not, testing approach |
+| `dependencies` | External and internal dependencies this directory relies on |
+| `functionality` | Capabilities this directory provides externally |
+| `files` | Markdown table of files with descriptions |
 
 ## Steps
 
-### 1. Scan directories
+### 1. Gather project info
 
-Find all non-git-ignored directories:
+Run these commands to collect metadata for `upsert_context` calls:
+
 ```bash
-find . -type d -not -path './.git/*' | while read dir; do
-  git check-ignore -q "$dir" 2>/dev/null || echo "$dir"
-done
+git rev-parse --short HEAD        # git_ref
+git remote get-url origin         # derive repo name (owner/repo)
 ```
 
-### 2. Classify each directory
+Store the project root as the absolute path to the repo root (`git rev-parse --show-toplevel`).
 
-For each directory, classify it into one of three categories:
+### 2. Check context status
 
-- **Missing** — no `.context.md` file exists
-- **Stale** — `.context.md` exists but has changes since last update
-- **Up-to-date** — `.context.md` exists and no changes detected
+If a specific directory was given in `$ARGUMENTS`, skip this step and go directly to step 4 (creating/updating that directory).
 
-To detect staleness, extract the `updated-at` ref from the bottom of the file:
-```bash
-grep -oP '(?<=<!-- updated-at: )\w+(?= -->)' "$dir/.context.md"
-```
+Otherwise, call `check_context_status` with the project root. This returns three lists:
 
-If a ref is found, check for changes:
-```bash
-git diff <ref>..HEAD -- "$dir"
-```
-
-If the diff is empty, the file is **up-to-date**. If there are changes, the file is **stale**.
-
-If no ref is found (legacy file), treat it as **stale**.
+- **needs_creation** — directories with no stored context
+- **needs_deletion** — orphaned contexts (directory deleted or gitignored)
+- **needs_update** — contexts where the stored `git_ref` is behind HEAD
 
 ### 3. Report findings
 
-Get the current HEAD ref for later use:
-```bash
-git rev-parse --short HEAD
+Present the three lists to the user in a summary table. For example:
+
+```
+Status          | Count | Directories
+----------------|-------|------------
+Needs creation  | 3     | lib/utils, lib/core, bin/tools
+Needs update    | 2     | configs/claude, modules
+Orphaned        | 1     | old/removed-dir
 ```
 
-Print a summary:
-- List **up-to-date** directories (no action needed)
-- List **stale** directories with a brief note of what changed
-- List **missing** directories
+For orphaned contexts, note that there is no delete tool — the user must manually remove files from `.sudo-context/`.
 
-### 4. Update stale context files
+### 4. Group directories by depth for parallel processing
 
-For each **stale** directory:
+Combine `needs_update` and `needs_creation` into a single work list. Sort by path depth, **deepest first** (e.g., `a/b/c` before `a/b` before `a`). Group directories at the same depth level together.
 
-1. Read the existing `.context.md`
-2. Get the diff since the stored ref (or full directory listing if no ref):
-   ```bash
-   git diff <ref>..HEAD -- "$dir"
-   ```
-3. Read any new files that appear in the diff
-4. Update only the affected sections:
-   - **Files table** — add/remove/update entries for changed files
-   - **Functionality** — update if the diff reveals new or removed capabilities
-   - **Purpose** — update only if the directory's role fundamentally changed
-   - **TODO** — update if completed tasks are visible in the diff
-5. Update the `<!-- updated-at: <ref> -->` comment at the bottom to current HEAD
+This ensures child directories are processed before parents, so parent context can reference child information.
 
-### 5. Generate missing context files
+### 5. Process each depth level with parallel subagents
 
-For each **missing** directory:
+For each depth level, starting from the deepest:
 
-1. Skip directories that only contain subdirectories (no source files)
-2. Read the files in the directory
-3. Analyze their purpose and functionality
-4. Generate a `.context.md` following the format below
-5. Ask the user before creating each file
+1. Create a **TaskCreate** entry for each directory at that depth level
+2. Launch one **Task subagent** (`subagent_type: "general-purpose"`) per directory. All subagents at the same depth run **in parallel** (multiple Task tool calls in a single message)
+3. **Wait** for all subagents at that depth to complete before proceeding to the next (shallower) level
+4. Mark each task as completed as subagents finish
 
-### 6. Validate all context files
+Each subagent receives the `project_root`, `repo`, `git_ref`, and the target directory, plus the instructions below for its category.
 
-After updates, validate that every `.context.md` has the required sections:
-- `## Purpose`
-- `## Functionality`
-- `## Files`
-- `## TODO`
+#### Subagent instructions for stale directories (needs_update):
 
-## Context File Format
+1. Call `query_context` to get the existing sections
+2. Read changed files using `git diff <stored_git_ref>..HEAD -- <directory>` to understand what changed
+3. Read the directory's files with Glob and Read to understand current state
+4. For each of the 8 required sections, decide if it needs updating based on the diff
+5. Call `upsert_context` with only the sections that changed (merging preserves unchanged sections)
 
-```markdown
-# Directory Name
+#### Subagent instructions for missing directories (needs_creation):
 
-## Purpose
+1. Use Glob to list files in the directory
+2. Read key files to understand the directory's purpose
+3. Generate all 8 required sections
+4. Call `upsert_context` with all sections
 
-Describe the overall role of this directory and how it relates to the rest of the project.
+### 6. Section writing guidelines
 
-## Functionality
+When generating section content:
 
-High-level description of functionality this directory provides externally:
-- Feature or capability 1
-- Feature or capability 2
+- **description**: One sentence. Be specific. "Shell module for Claude Code installation and config" not "A module".
+- **purpose**: 2-3 sentences. Explain why this exists and how it fits in the project.
+- **strengths**: Bullet list. What works well — clean API, good test coverage, clear separation of concerns, etc.
+- **weaknesses**: Bullet list. Be honest — tech debt, missing tests, tight coupling, unclear naming, etc. If none, say "None identified".
+- **test_coverage**: Describe what's tested and how. If no tests exist, say "No tests" and note what should be tested.
+- **dependencies**: Bullet list of external packages and internal modules this directory depends on.
+- **functionality**: Bullet list of capabilities this directory provides to other parts of the project.
+- **files**: Markdown table with `| File | Description |` header. One row per file.
 
-## Files
+### 7. Progress tracking
 
-| File | Description |
-|------|-------------|
-| `file1.ts` | Brief description |
-| `file2.ts` | Brief description |
-
-## TODO
-
-| Priority | Task |
-|----------|------|
-| P0 | Critical tasks that block other work |
-| P1 | Important tasks for core functionality |
-| P2 | Nice-to-have improvements |
-| P3 | Future/low-priority items |
-
-<!-- updated-at: abc1234 -->
-```
-
-The `<!-- updated-at: ... -->` comment must always be the last line. It stores the short git ref from when the file was last created or updated.
-
-## Options
-
-- Run without arguments to scan and report
-- When missing files are found, ask the user if they want to generate them
-- Skip directories that only contain other directories (no source files)
+- Use TaskCreate at the start to create one task per directory that needs work
+- Update tasks to `in_progress` when launching the subagent, `completed` when done
+- After each depth level completes, report progress: "Depth 3 complete (4/12 directories done)"
+- Use the same `git_ref` and `repo` for all `upsert_context` calls in one session

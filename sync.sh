@@ -29,6 +29,7 @@ FILE_MAPS=(
 DIR_MAPS=(
     "configs/claude/skills:$HOME/.claude/skills:dir-skill"
     "configs/claude/agents:$HOME/.claude/agents:dir-md"
+    "configs/claude/commands:$HOME/.claude/commands:dir-md"
     "configs/claude/rules:$HOME/.claude/rules:dir-md"
     "configs/claude/mcp:$HOME/.claude/mcp:dir-recurse"
     "bin:$HOME/.local/bin:dir-all"
